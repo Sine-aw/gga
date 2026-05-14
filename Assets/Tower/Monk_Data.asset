@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29cd03145bf54f8449e0e8966ee408a3, type: 3}
+  m_Name: Monk_Data
+  m_EditorClassIdentifier: Assembly-CSharp::UnitData
+  unitName: Monk
+  shopPrice: 350
+  towerPrefab: {fileID: 4337365350302862088, guid: ee8057a4aea035549870163ca48ae5c8,
+    type: 3}
+  unitModel: {fileID: 4337365350302862088, guid: ee8057a4aea035549870163ca48ae5c8,
+    type: 3}
+  projectilePrefab: {fileID: 0}
+  isUnlocked: 0
+  stats:
+  - level: 1
+    damage: 12
+    range: 0.5
+    fireRate: 5
+    upgradeCost: 300
+  unitSprite: {fileID: 21300000, guid: d248ca8245539e84b9b114a47254b2d9, type: 3}
