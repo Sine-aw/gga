@@ -22,6 +22,7 @@ public class UnitSelectionManager : MonoBehaviour
                 // 핵심: 저장! 슬롯 번호(i)에 유닛 이름을 저장합니다.
                 PlayerPrefs.SetString("EquippedUnit_" + i, data.unitName);
                 PlayerPrefs.Save();
+                Debug.Log(i + "번 슬롯에 저장됨: " + data.unitName); // 로그로 확인!
                 return true;
             }
         }

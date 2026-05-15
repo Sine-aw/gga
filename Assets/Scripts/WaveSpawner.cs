@@ -27,9 +27,34 @@ public class WaveSpawner : MonoBehaviour
     private float countdown = 2f;
     private int waveIndex = 0;
 
+    void Start()
+    {
+        // 씬이 시작될 때 시간을 정상 속도(1배속)로 강제 고정
+        Time.timeScale = 1f;
+
+        // 기존 설정들
+        countdown = 2f;
+        waveIndex = 0;
+    }
+
     void Update()
     {
-        if (waveIndex >= waves.Count) return; // 모든 웨이브 종료 시 중단
+        // 1. 모든 웨이브 소환이 끝났는지 확인
+        if (waveIndex >= waves.Count)
+        {
+            // 2. 필드에 남은 적이 한 마리도 없는지 확인
+            // Enemy 스크립트가 붙은 오브젝트가 0개라면 클리어!
+            if (GameObject.FindObjectsOfType<Enemy>().Length == 0)
+            {
+                // 중복 실행 방지 (이미 패널이 떠 있다면 패스)
+                if (ResultUI.instance != null && !ResultUI.instance.resultPanel.activeSelf)
+                {
+                    Debug.Log("모든 웨이브 클리어! 보상 지급 및 패널 오픈");
+                    GameResultManager.instance.MissionComplete();
+                }
+            }
+            return;
+        }
 
         if (countdown <= 0f)
         {
@@ -41,12 +66,10 @@ public class WaveSpawner : MonoBehaviour
 
     IEnumerator SpawnWave()
     {
-        Wave currentWave = waves[waveIndex]; // 현재 웨이브 설정 가져오기
+        Wave currentWave = waves[waveIndex];
 
-        // 웨이브에 설정된 적 종류만큼 반복
         foreach (WaveContent content in currentWave.enemyList)
         {
-            // 설정된 마릿수만큼 반복 소환
             for (int i = 0; i < content.count; i++)
             {
                 SpawnEnemy(content.enemyData);
@@ -54,7 +77,13 @@ public class WaveSpawner : MonoBehaviour
             }
         }
 
-        waveIndex++; // 다음 웨이브로
+        // [웨이브 클리어 보상 추가] 웨이브 하나가 끝날 때마다 골드 지급
+        if (GameResultManager.instance != null)
+        {
+            GameResultManager.instance.AddWaveReward();
+        }
+
+        waveIndex++;
     }
 
     void SpawnEnemy(EnemyData data)

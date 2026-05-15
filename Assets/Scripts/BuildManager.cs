@@ -5,10 +5,15 @@ using UnityEngine.EventSystems;
 public class BuildManager : MonoBehaviour
 {
     public static BuildManager instance;
-
     private UnitData unitToBuild;
     private GameObject previewObject;
+    private SpriteRenderer previewRangeRenderer;
 
+    public bool IsBuildingMode() { return previewObject != null; }
+
+    [Header("Settings")]
+    public LayerMask groundLayer;
+    public float minDistanceBetweenUnits = 1.2f;
     public int maxUnitCount = 12;
     private List<GameObject> deployedUnits = new List<GameObject>();
 
@@ -16,36 +21,34 @@ public class BuildManager : MonoBehaviour
 
     void Update()
     {
-        if (unitToBuild != null)
+        if (previewObject != null)
         {
-            MovePreview();
+            // 1. 마우스 좌표 계산 (기존 로직 유지)
+            Vector3 mousePos = Input.mousePosition;
+            mousePos.z = 10f;
+            Vector3 mPos = Camera.main.ScreenToWorldPoint(mousePos);
+            Vector3 spawnPos = new Vector3(mPos.x, mPos.y, 0f);
+            previewObject.transform.position = spawnPos;
 
-            // --- [실시간 설치 가능 여부 체크 추가] ---
-            CheckPlacementValidity();
-            // --------------------------------------
+            bool canBuild = CheckCanBuild(spawnPos);
 
+            if (previewRangeRenderer != null)
+                previewRangeRenderer.color = canBuild ? new Color(1, 1, 1, 0.5f) : new Color(1, 0, 0, 0.5f);
+
+            // 2. [수정] 클릭 감지: UI가 가리고 있어도 배치를 시도하게 변경
             if (Input.GetMouseButtonDown(0))
             {
-                if (EventSystem.current.IsPointerOverGameObject()) return;
-
-                Vector3 mPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                Vector2 clickPos2D = new Vector2(mPos.x, mPos.y);
-                Collider2D groundHit = Physics2D.OverlapPoint(clickPos2D);
-
-                Collider2D overlapHit = Physics2D.OverlapCircle(clickPos2D, 0.4f, LayerMask.GetMask("Tower"));
-
-                if (groundHit != null && groundHit.CompareTag("Ground") && overlapHit == null)
+                // 진짜 '버튼'이나 '패널' 같은 UI 위인지 다시 확인
+                if (EventSystem.current.IsPointerOverGameObject())
                 {
-                    // 3. [추가] 인원수 제한 확인
-                    if (deployedUnits.Count < maxUnitCount)
-                    {
-                        Vector3 buildPos = new Vector3(mPos.x, mPos.y, 0f);
-                        BuildTower(unitToBuild.towerPrefab, unitToBuild.stats[0].upgradeCost, buildPos);
-                    }
-                    else
-                    {
-                        Debug.Log("최대 유닛 설치 개수(12마리)를 초과했습니다!");
-                    }
+                    // [비상 조치] 로그가 뜬다면, 일단 무시하고 배치를 진행해봅니다.
+                    // 만약 버튼 클릭과 겹치는 게 걱정된다면 이 로그를 보고 UI를 치워야 합니다.
+                    Debug.Log("UI가 감지되었지만 배치를 강행합니다.");
+                }
+
+                if (canBuild)
+                {
+                    BuildUnit(spawnPos); // 실제 배치 함수 호출
                 }
             }
 
@@ -53,123 +56,104 @@ public class BuildManager : MonoBehaviour
         }
     }
 
-    // 실시간으로 바닥 태그를 확인해서 색상을 바꾸는 함수
-    void CheckPlacementValidity()
+    bool CheckCanBuild(Vector3 pos)
     {
-        if (previewObject == null) return;
+        if (deployedUnits.Count >= maxUnitCount) return false;
 
-        Vector3 mPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Collider2D hit = Physics2D.OverlapPoint(mPos);
+        // 유닛 콜라이더 잠시 끄기 (가림 방지)
+        Collider2D previewCol = previewObject.GetComponent<Collider2D>();
+        if (previewCol != null) previewCol.enabled = false;
 
-        // 사거리 원(Circle) 오브젝트를 찾습니다.
-        Transform rangeCircle = previewObject.transform.Find("Circle");
-        if (rangeCircle == null && previewObject.transform.childCount > 0)
-            rangeCircle = previewObject.transform.GetChild(0);
+        // 마우스 위치에 'Ground' 레이어가 있는지 확인
+        Collider2D groundHit = Physics2D.OverlapPoint(pos, groundLayer);
 
-        if (rangeCircle != null)
+        if (previewCol != null) previewCol.enabled = true;
+
+        if (groundHit == null) return false;
+
+        // 거리 체크
+        foreach (GameObject unit in deployedUnits)
         {
-            SpriteRenderer sr = rangeCircle.GetComponent<SpriteRenderer>();
-            if (sr != null)
-            {
-                // 태그가 "Ground"면 하얀색(또는 원래색), 아니면 빨간색
-                if (hit != null && hit.CompareTag("Ground"))
-                {
-                    sr.color = new Color(1f, 1f, 1f, 0.3f); // 정상 (반투명 흰색)
-                }
-                else
-                {
-                    sr.color = new Color(1f, 0f, 0f, 0.4f); // 설치 불가 (반투명 빨간색)
-                }
-            }
+            if (unit != null && Vector2.Distance(pos, unit.transform.position) < minDistanceBetweenUnits)
+                return false;
         }
+
+        return true;
     }
 
-    public void SelectUnitToBuild(UnitData unit)
+    public void SelectUnitToBuild(UnitData data)
     {
-        unitToBuild = unit;
+        if (data == null) return;
         if (previewObject != null) Destroy(previewObject);
 
-        if (unit.unitModel != null)
+        unitToBuild = data;
+        previewObject = Instantiate(unitToBuild.towerPrefab);
+
+        Tower t = previewObject.GetComponent<Tower>();
+        if (t != null) t.isPlaced = false;
+
+        SetUnitAlpha(previewObject, 0.5f);
+
+        Transform circle = previewObject.transform.Find("Circle");
+        if (circle != null)
         {
-            previewObject = Instantiate(unit.unitModel);
-            SetUnitAlpha(previewObject, 0.5f);
-
-            // 미리보기 유닛의 공격 기능 끄기
-            Tower t = previewObject.GetComponent<Tower>();
-            if (t != null) t.enabled = false;
-
-            foreach (var col in previewObject.GetComponentsInChildren<Collider2D>())
-                col.enabled = false;
-
-            // 사거리 원 설정
-            UpdateRangeVisual(unit.stats[0].range);
+            previewRangeRenderer = circle.GetComponent<SpriteRenderer>();
+            float range = data.stats[0].range;
+            circle.localScale = new Vector3(range * 2, range * 2, 1);
+            circle.gameObject.SetActive(true);
         }
     }
 
-    void BuildTower(GameObject turretPrefab, int cost, Vector3 position)
+    void BuildUnit(Vector3 pos)
     {
-        if (PlayerStats.Money < cost) return;
+        Debug.Log("클릭 감지됨! 설치를 시도합니다."); // 이 로그가 뜨는지 확인
+        if (unitToBuild == null) return;
 
-        PlayerStats.Money -= cost;
-        if (PlayerStats.instance != null) PlayerStats.instance.UpdateMoneyUI();
+        // 1. 유닛 데이터가 없는지 확인
+        if (unitToBuild == null)
+        {
+            Debug.LogError("설치할 유닛 데이터가 선택되지 않았습니다!");
+            return;
+        }
 
-        GameObject newUnit = Instantiate(turretPrefab, position, Quaternion.identity);
-        deployedUnits.Add(newUnit);
+        // 2. [가장 의심되는 곳] 돈이 부족한지 확인
+        if (PlayerStats.Money < unitToBuild.unitPrice)
+        {
+            Debug.LogWarning("돈이 부족합니다! 현재 잔액: " + PlayerStats.Money + " / 필요 금액: " + unitToBuild.unitPrice);
+            return;
+        }
 
-        // [중요] 설치가 끝났으므로 미리보기를 삭제하고 선택을 해제합니다.
+        // 3. 실제 생성
+        Debug.Log("유닛 생성 시도: " + unitToBuild.unitName);
+        GameObject finalUnit = Instantiate(unitToBuild.towerPrefab, pos, Quaternion.identity);
+
+        Tower t = finalUnit.GetComponent<Tower>();
+        if (t != null)
+        {
+            t.data = unitToBuild;
+            t.isPlaced = true;
+        }
+
+        deployedUnits.Add(finalUnit);
+        PlayerStats.Money -= unitToBuild.unitPrice;
+
+        Debug.Log("설치 완료! 남은 돈: " + PlayerStats.Money);
         ClearSelection();
     }
 
-    public void RemoveUnit(GameObject unit)
+    public void ClearSelection()
     {
-        if (deployedUnits.Contains(unit))
-        {
-            deployedUnits.Remove(unit);
-        }
-    }
-
-    // 마우스를 따라오게 하는 핵심 함수
-    void MovePreview()
-    {
-        if (previewObject == null) return;
-
-        // 이름을 겹치지 않게 'pPos'로 수정
-        Vector3 pPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        previewObject.transform.position = new Vector3(pPos.x, pPos.y, 0f);
-    }
-
-    void UpdateRangeVisual(float range)
-    {
-        Transform rangeCircle = previewObject.transform.Find("Circle");
-        if (rangeCircle == null && previewObject.transform.childCount > 0)
-            rangeCircle = previewObject.transform.GetChild(0);
-
-        if (rangeCircle != null)
-        {
-            rangeCircle.gameObject.SetActive(true);
-            float s = range * 2f;
-            rangeCircle.localScale = new Vector3(s, s, 1f);
-        }
+        unitToBuild = null;
+        if (previewObject != null) Destroy(previewObject);
+        previewRangeRenderer = null;
     }
 
     void SetUnitAlpha(GameObject obj, float alphaValue)
     {
         foreach (var r in obj.GetComponentsInChildren<SpriteRenderer>())
         {
-            Color c = r.color;
-            c.a = (r.gameObject.name == "Circle") ? 0.3f : alphaValue;
-            r.color = c;
+            if (r.gameObject.name == "Circle") continue;
+            Color c = r.color; c.a = alphaValue; r.color = c;
         }
-    }
-
-    void ClearSelection()
-    {
-        unitToBuild = null;
-        if (previewObject != null) Destroy(previewObject); // 미리보기 파괴
-    }
-
-    public void SelectTowerToBuild(TowerData tower)
-    {
-        
     }
 }

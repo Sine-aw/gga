@@ -14,16 +14,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
   unitName: Soldier
   shopPrice: 1000
+  unitPrice: 400
   towerPrefab: {fileID: 2868146655731777058, guid: 81686d34e13e5144fbd152c4821228df,
     type: 3}
   unitModel: {fileID: 2868146655731777058, guid: 81686d34e13e5144fbd152c4821228df,
     type: 3}
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 8241712251387867172, guid: 02aa213c2f598c24a9aa7c3d94c20957,
+    type: 3}
   isUnlocked: 0
   stats:
   - level: 1
-    damage: 1
+    damage: 2
     range: 4
-    fireRate: 0.5
+    fireRate: 4
+    upgradeCost: 0
+  - level: 2
+    damage: 2
+    range: 5
+    fireRate: 4
     upgradeCost: 700
+  - level: 3
+    damage: 2
+    range: 6
+    fireRate: 4
+    upgradeCost: 825
+  - level: 4
+    damage: 4
+    range: 6
+    fireRate: 8
+    upgradeCost: 1650
+  - level: 5
+    damage: 7
+    range: 7
+    fireRate: 10
+    upgradeCost: 3500
   unitSprite: {fileID: 21300000, guid: 814bff80774c25f47a52bb4ced3012ed, type: 3}

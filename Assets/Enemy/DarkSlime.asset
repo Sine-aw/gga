@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9749a019fa89b7c42b691c5315442734, type: 3}
-  m_Name: BossEnemy
+  m_Name: DarkSlime
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  enemyName: Boss
-  hp: 100
-  speed: 0.5
-  enemySprite: {fileID: 21300142, guid: 29c9cded5e558164aaf8c9bf08aa1510, type: 3}
-  goldReward: 100
+  enemyName: DarkSlime
+  hp: 350
+  speed: 0.2
+  enemySprite: {fileID: 21300000, guid: a4ec39b1a4fcbee4daa01335aec8ef31, type: 3}
+  goldReward: 300

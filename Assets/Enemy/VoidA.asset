@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9749a019fa89b7c42b691c5315442734, type: 3}
-  m_Name: FastEnemy
+  m_Name: VoidA
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  enemyName: Fast
-  hp: 10
-  speed: 2.5
-  enemySprite: {fileID: 21300112, guid: 29c9cded5e558164aaf8c9bf08aa1510, type: 3}
-  goldReward: 15
+  enemyName: VoidA
+  hp: 1500
+  speed: 1.2
+  enemySprite: {fileID: 21300066, guid: c6551d5c9e174f44ba33a4a4e61b94d0, type: 3}
+  goldReward: 2000

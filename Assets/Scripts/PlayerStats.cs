@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlayerStats : MonoBehaviour
 {
-    public static int Money = 100; // 초기 자본
+    public static int Money = 150; // 초기 자본
     public TextMeshProUGUI moneyText;
     public static PlayerStats instance;
 
@@ -14,6 +14,10 @@ public class PlayerStats : MonoBehaviour
 
     void Start()
     {
+        // "StartRuby"라는 이름으로 저장된 값을 가져와서 Money에 할당합니다.
+        // 값이 없으면 기본값인 100을 사용합니다.
+        Money = PlayerPrefs.GetInt("StartRuby", 150);
+
         UpdateMoneyUI();
     }
 

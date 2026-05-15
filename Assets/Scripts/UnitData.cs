@@ -15,6 +15,7 @@ public class UnitData : ScriptableObject
 {
     public string unitName;
     public int shopPrice;
+    public int unitPrice;
     public GameObject towerPrefab;
     public GameObject unitModel;
     public GameObject projectilePrefab;

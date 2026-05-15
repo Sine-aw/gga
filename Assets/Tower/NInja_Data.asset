@@ -14,16 +14,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
   unitName: Ninja
   shopPrice: 500
+  unitPrice: 200
   towerPrefab: {fileID: 8182391654813930393, guid: 1e22c8a3896a3af48a8e7c601fc60153,
     type: 3}
   unitModel: {fileID: 8182391654813930393, guid: 1e22c8a3896a3af48a8e7c601fc60153,
     type: 3}
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 3453336077812235509, guid: 87fad6536d73c1746a09bc09eac747fe,
+    type: 3}
   isUnlocked: 0
   stats:
   - level: 1
-    damage: 3
+    damage: 1
     range: 7
-    fireRate: 3.2
+    fireRate: 1.7
+    upgradeCost: 0
+  - level: 2
+    damage: 1
+    range: 7.5
+    fireRate: 1.7
     upgradeCost: 290
+  - level: 3
+    damage: 1
+    range: 8
+    fireRate: 1.9
+    upgradeCost: 600
+  - level: 4
+    damage: 2
+    range: 8
+    fireRate: 2
+    upgradeCost: 1330
+  - level: 5
+    damage: 3
+    range: 10
+    fireRate: 2.3
+    upgradeCost: 2220
   unitSprite: {fileID: 21300000, guid: 96eb4403949fdc044b857c1a6c8647b0, type: 3}

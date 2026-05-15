@@ -1,59 +1,58 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using TMPro;
 
 public class SummonPanelManager : MonoBehaviour
 {
-    public UnitData[] allUnitDatas;   // 프로젝트의 모든 UnitData (검색용)
-    public GameObject summonButtonPrefab; // 하단에 생성될 버튼 프리팹
-    public Transform panelParent;    // 검은색 UI 패널 (Content 레이아웃)
+    public List<UnitData> allUnitDatas;
+    public GameObject summonButtonPrefab;
+    public Transform panelParent;
 
-    void Start()
-    {
-        CreateSummonButtons();
-    }
+    void Start() { CreateSummonButtons(); }
 
-    void CreateSummonButtons()
+    public void CreateSummonButtons()
     {
-        // 1. 기존에 패널에 붙어있던 연습용 버튼들은 제거
         foreach (Transform child in panelParent) { Destroy(child.gameObject); }
 
-        // 2. 저장된 5개의 슬롯 확인
         for (int i = 0; i < 5; i++)
         {
             string savedName = PlayerPrefs.GetString("EquippedUnit_" + i, "");
+            if (string.IsNullOrEmpty(savedName)) continue;
 
-            if (!string.IsNullOrEmpty(savedName))
+            UnitData data = FindDataByName(savedName);
+            if (data != null)
             {
-                UnitData data = FindDataByName(savedName);
-                if (data != null)
-                {
-                    // 버튼 생성
-                    GameObject btnObj = Instantiate(summonButtonPrefab, panelParent);
+                GameObject btnObj = Instantiate(summonButtonPrefab, panelParent);
 
-                    // 버튼 내부의 이미지 컴포넌트 찾아서 유닛 아이콘 넣기
-                    // (자식 오브젝트 중 Image가 있는 곳을 찾습니다)
-                    Image icon = btnObj.transform.Find("Icon").GetComponent<Image>();
-                    if (icon != null) icon.sprite = data.unitSprite;
+                // UI 설정
+                Image icon = btnObj.transform.Find("Icon").GetComponent<Image>();
+                if (icon != null) icon.sprite = data.unitSprite;
 
-                    // 버튼 클릭 시 유닛 소환 로직 연결 (나중에 BuildManager와 연동)
-                    btnObj.GetComponent<Button>().onClick.AddListener(() => OnClickSummon(data));
-                }
+                TextMeshProUGUI priceText = btnObj.transform.Find("PriceText").GetComponent<TextMeshProUGUI>();
+                if (priceText != null) priceText.text = data.unitPrice.ToString();
+
+                // [해결의 핵심] 
+                // 버튼 하나당 딱 하나의 데이터만 1:1로 고정시켜주는 코드입니다.
+                // 이렇게 하면 46번 줄에서 나던 Null 에러가 물리적으로 불가능해집니다.
+                UnitData targetData = data;
+
+                Button btn = btnObj.GetComponent<Button>();
+                btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(() => {
+                    // 이제 targetData는 버튼이 클릭될 때까지 이 안에서 안전하게 보존됩니다.
+                    Debug.Log(targetData.unitName + " 클릭됨");
+                    if (BuildManager.instance != null)
+                    {
+                        BuildManager.instance.SelectUnitToBuild(targetData);
+                    }
+                });
             }
         }
     }
 
     UnitData FindDataByName(string name)
     {
-        foreach (var data in allUnitDatas)
-        {
-            if (data.unitName == name) return data;
-        }
-        return null;
-    }
-
-    void OnClickSummon(UnitData data)
-    {
-        Debug.Log(data.unitName + " 소환 버튼 클릭됨!");
-        // 여기에 소환 모드 활성화 코드를 넣을 예정입니다.
+        return allUnitDatas.Find(x => x.unitName == name);
     }
 }

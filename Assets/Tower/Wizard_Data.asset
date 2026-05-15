@@ -14,16 +14,63 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
   unitName: Wizard
   shopPrice: 1950
+  unitPrice: 700
   towerPrefab: {fileID: 7717818581488313511, guid: 4286ae5ac6290134892156745c1e7e9b,
     type: 3}
   unitModel: {fileID: 7717818581488313511, guid: 4286ae5ac6290134892156745c1e7e9b,
     type: 3}
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 7366855414046754234, guid: a942ef0694d004a4abd79f75a040d0cf,
+    type: 3}
   isUnlocked: 0
   stats:
   - level: 1
     damage: 20
-    range: 3
-    fireRate: 7
+    range: 3.5
+    fireRate: 0.3
+    upgradeCost: 0
+  - level: 2
+    damage: 20
+    range: 4
+    fireRate: 0.4
     upgradeCost: 1200
+  - level: 3
+    damage: 20
+    range: 4.5
+    fireRate: 0.5
+    upgradeCost: 2400
+  - level: 4
+    damage: 40
+    range: 5
+    fireRate: 0.6
+    upgradeCost: 4800
+  - level: 5
+    damage: 80
+    range: 7
+    fireRate: 1
+    upgradeCost: 9600
+  - level: 6
+    damage: 160
+    range: 9
+    fireRate: 1.4
+    upgradeCost: 19200
+  - level: 7
+    damage: 320
+    range: 11
+    fireRate: 1.8
+    upgradeCost: 38400
+  - level: 8
+    damage: 640
+    range: 13
+    fireRate: 2.2
+    upgradeCost: 76800
+  - level: 9
+    damage: 1280
+    range: 15
+    fireRate: 2.6
+    upgradeCost: 153600
+  - level: 10
+    damage: 5000
+    range: 50
+    fireRate: 5
+    upgradeCost: 500000
   unitSprite: {fileID: 21300000, guid: abe13606cd5b0e14d8c025874bc5b30f, type: 3}

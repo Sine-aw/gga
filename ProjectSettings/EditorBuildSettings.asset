@@ -18,10 +18,10 @@ EditorBuildSettings:
     path: Assets/Scenes/Tower.unity
     guid: 6342099e5486f644c9d38197719660a8
   - enabled: 1
-    path: Assets/Scenes/Stage_1.unity
+    path: Assets/Scenes/Stage_2.unity
     guid: 1aa326dae993e7a409772f41eef86c86
   - enabled: 1
-    path: Assets/Scenes/Stage_2.unity
+    path: Assets/Scenes/Stage_1.unity
     guid: 780cac8482aa6314b87ed1288c64972f
   - enabled: 1
     path: Assets/Scenes/Stage_3.unity

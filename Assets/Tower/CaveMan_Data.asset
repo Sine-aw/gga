@@ -14,16 +14,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
   unitName: CaveMan
   shopPrice: 100
+  unitPrice: 75
   towerPrefab: {fileID: 6013597141670104860, guid: 5d319eb6a1855da47801dd0bc70eaa84,
     type: 3}
   unitModel: {fileID: 6013597141670104860, guid: 5d319eb6a1855da47801dd0bc70eaa84,
     type: 3}
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 7898546101638878192, guid: d02390a2d0f80a04e9d42da336a6b234,
+    type: 3}
   isUnlocked: 0
   stats:
   - level: 1
-    damage: 4
-    range: 1.5
-    fireRate: 1
-    upgradeCost: 60
+    damage: 5
+    range: 2
+    fireRate: 0.5
+    upgradeCost: 0
+  - level: 2
+    damage: 5
+    range: 2.5
+    fireRate: 0.5
+    upgradeCost: 50
+  - level: 3
+    damage: 5
+    range: 3
+    fireRate: 0.7
+    upgradeCost: 120
+  - level: 4
+    damage: 7
+    range: 3
+    fireRate: 0.75
+    upgradeCost: 340
+  - level: 5
+    damage: 8
+    range: 3.5
+    fireRate: 0.9
+    upgradeCost: 600
   unitSprite: {fileID: 21300000, guid: 8dd7256c7c0115c4ea53231f68602445, type: 3}
